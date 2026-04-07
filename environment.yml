@@ -1,0 +1,7 @@
+name: dsci-575-project
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - datasets
+  - ipykernel
