@@ -1,10 +1,39 @@
-name: dsci-575-project
+name: '575-project'
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
-  - datasets
+  - matplotlib
   - ipykernel
+  - spacy
+  - umap-learn
+  - torchvision
+  - panel
+  - seaborn
+  - scikit-learn=1.7.1
+  - nltk
+  - wikipedia
+  - nb_conda_kernels
+  - datasets
+  - pandas
+  - python=3.12
+  - ipywidgets
+  - yellowbrick
+  - jupyter-dash
+  - pip
+  - wordcloud
+  - sentence-transformers
+  - requests
+  - autograd
+  - torchaudio
+  - plotly
+  - protobuf
+  - pytorch
+  - gensim
+  - openpyxl
+  - scikit-surprise
 pip:
   - langchain-core
   - langchain-community
+  - rank_bm25
+  - faiss-cpu
+  - langchain-huggingface
