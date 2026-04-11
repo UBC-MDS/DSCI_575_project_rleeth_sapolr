@@ -29,7 +29,20 @@ def semantic_search(documents, query, k=5, sample_size=None, reload_index=False)
 
         vectorstore.save_local(index_path)
 
-    results = vectorstore.similarity_search_with_score(query, k=k)
+    results = vectorstore.similarity_search_with_score(query, k=len(documents))
 
+    product_scores = {}
+    product_docs = {}
 
+    for doc, score in results:
+
+        asin = doc.metadata["asin"]
+
+        if asin not in product_scores or score < product_scores[asin]:
+            product_scores[asin] = score
+            product_docs[asin] = doc
+
+    ranked_products = sorted(product_scores.items(), key=lambda x: x[1])[:k]
+
+    results = [(product_docs[asin], score) for asin, score in ranked_products]
     return results

@@ -2,6 +2,7 @@ from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 from rank_bm25 import BM25Okapi
 import re
+from collections import defaultdict
 
 def text_tokenizer(text: str) -> list[str]:
     stopwords = {
@@ -33,15 +34,20 @@ def bm25_search(bm25, documents: list[Document], query: str, k=5):
 
     scores = bm25.get_scores(tokenized_query)
 
-    ranked_idx = sorted(
-        range(len(scores)),
-        key=lambda i: scores[i],
-        reverse=True
-    )[:k]
+    product_scores = defaultdict(float)
+    product_docs = {}
 
-    results = [
-        (documents[i], scores[i])
-        for i in ranked_idx
-    ]
+    for i, score in enumerate(scores):
 
+        doc = documents[i]
+        asin = doc.metadata["asin"]
+
+        # keep the highest score among reviews for each product
+        product_scores[asin] = max(product_scores[asin], score)
+        if asin not in product_docs:
+            product_docs[asin] = doc
+
+    ranked_products = sorted(product_scores.items(), key=lambda x: x[1], reverse=True)[:k]
+
+    results = [(product_docs[asin], score) for asin, score in ranked_products]
     return results
