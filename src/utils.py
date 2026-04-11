@@ -1,17 +1,3 @@
-def deduplicate_results(results, key="asin", top_k=5):
-    seen = set()
-    unique_results = []
-
-    for r in results:
-        value = r.get(key, None)
-        if value not in seen:
-            seen.add(value)
-            unique_results.append(r)
-        if len(unique_results) == top_k:
-            break
-
-    return unique_results
-
 def format_result(result):
     doc, score = result
     
