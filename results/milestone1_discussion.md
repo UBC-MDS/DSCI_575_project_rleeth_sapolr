@@ -2,8 +2,6 @@
 
 ## **Results**
 
-## Results
-
 | Query | BM25 Results | Semantic Results |
 |------|-------------|-----------------|
 | ultra facial barrier-hydrating cleanser | 1. Neutrogena Ultra Light Facial Cleansing Oil & Makeup Remover, Non-Comedogenic Face Oil Cle...<br>ASIN: B00U2VQZC4 \| Score: 17.793<br><br>2. Savannah Bee Company Propolis Extract Volcanic Ash and Charcoal Facial Cleanser<br>ASIN: B077V7KZC2 \| Score: 14.611<br><br>3. Facial Cleansing Brush with Ultra Hygienic Soft Silicone,PLAVOGUE 3 in 1 Waterproof Sonic ...<br>ASIN: B09747TST8 \| Score: 14.108<br><br>4. COSMETEA Facial Tea Stick Balm Cleanser - Black tea + Omija - Moisture Care<br>ASIN: B075WZFK66 \| Score: 14.047<br><br>5. Facial Cleansing Brush made with Ultra Hygienic Soft Silicone 4-PACK<br>ASIN: B08GR16Y3Z \| Score: 13.965 | 1. GOMAY Hydrating Amino Acid Foaming Facial Cleanser, Daily Face Wash for Makeup Remover wit...<br>ASIN: B09ZDQ626L \| Score: 0.630<br><br>2. REBONCEL Aqua Rich Hydrating Face Foam Cleanser Gentle Hypoallergenic pH Balance Korean Sk...<br>ASIN: B09X23VTSQ \| Score: 0.664<br><br>3. Hylunia Hydrate Body Wash - Energizing Blend With Mango 8.5 oz<br>ASIN: B07YNDWRCB \| Score: 0.708<br><br>4. Black Wolf - Men’s Gentle Hydrating Face Wash - 5 Fl Oz - Hydrating Sugar Technology Blend...<br>ASIN: B08GMW3HNG \| Score: 0.716<br><br>5. CELIMAX The Real Sedum Aqua Boosting Essence - with 65.33% Sedum Extract, Hyaluronic Acid ...<br>ASIN: B084WP4XS8 \| Score: 0.732 |
