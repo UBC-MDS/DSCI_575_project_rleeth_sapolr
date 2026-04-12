@@ -63,3 +63,5 @@ streamlit run app/app.py
 ```
 
 The application will be available at `http://localhost:8501/` (or the port shown in your terminal).
+
+The deployed application is also available on https://dsci-575-project-rleeth-sapolr.streamlit.app/
