@@ -21,6 +21,6 @@ cd <DSCI_575_project_rleeth_sapolr>
 Navigate to the root of the project dirctory and run:
 
 ``` bash
-conda env create -f environment.yml
+conda env create -f environment_local.yml
 conda activate dsci-575-project
 ```
