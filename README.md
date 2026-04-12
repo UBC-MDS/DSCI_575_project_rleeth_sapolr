@@ -24,3 +24,13 @@ Navigate to the root of the project dirctory and run:
 conda env create -f environment_local.yml
 conda activate dsci-575-project
 ```
+
+## Running the App Locally
+
+```bash
+# Make sure you're in the project root directory
+# Run the Streamlit app
+streamlit run app/app.py
+```
+
+The application will be available at `http://localhost:8501/` (or the port shown in your terminal).
