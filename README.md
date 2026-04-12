@@ -31,7 +31,55 @@ We performed the following text preprocessing in the text_tokenizer function in 
    Common English stopwords (e.g., *the*, *and*, *is*, *to*) were removed to reduce noise in the tokenized corpus. These words appear frequently but provide little semantic value for distinguishing relevant documents.
 
 ## Retrieval Workflow
-**** Add here ***
+The system implements the below two retrieval workflows:
+
+### BM25 Retrieval
+
+BM25 performs keyword-based retrieval using the tokenized corpus
+
+Workflow:
+
+1. **Tokenization**
+   - Documents are tokenized using the preprocessing steps described above.
+
+2. **Index Construction**
+   - A BM25 index is created using `BM25Okapi` from the tokenized documents.
+
+3. **Query Processing**
+   - The user query is tokenized using the same tokenizer.
+
+4. **Scoring**
+   - BM25 computes relevance scores for each document.
+
+5. **Product Aggregation**
+   - Since multiple reviews may belong to the same product (`asin`), scores are aggregated by product.
+   - The maximum BM25 score among reviews for each product is used.
+   - The top-k products are returned.
+
+---
+
+### Semantic Search
+
+Semantic search retrieves products using vector similarity
+
+Workflow:
+
+1. **Embedding Generation**
+   - Documents are converted to embeddings using the `all-MiniLM-L6-v2` sentence-transformer model.
+
+2. **Vector Indexing**
+   - Embeddings are indexed using **FAISS**.
+
+3. **Query Embedding**
+   - The user query is embedded using the same embedding model.
+
+4. **Similarity Search**
+   - FAISS retrieves review-level documents based on vector distance.
+
+5. **Product Aggregation**
+   - Results are grouped by `asin`.
+   - For each product, the lowest FAISS distance score (best semantic match) is kept.
+   - The top-k unique products are returned.
 
 ## Running the project locally
 
