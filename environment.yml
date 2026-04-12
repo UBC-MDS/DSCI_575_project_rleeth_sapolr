@@ -31,9 +31,10 @@ dependencies:
   - gensim
   - openpyxl
   - scikit-surprise
-pip:
-  - langchain-core
-  - langchain-community
-  - rank_bm25
-  - faiss-cpu
-  - langchain-huggingface
+  - streamlit
+  - pip:
+      - langchain-core
+      - langchain-community
+      - rank_bm25
+      - faiss-cpu
+      - langchain-huggingface
