@@ -10,6 +10,7 @@ from app.app import load_resources
 class RAGPipeline:
 
     SYSTEM_PROMPT = """
+    ***/no_think. DO NOT include any thinking process***
     You are a helpful Amazon shopping assistant.
     Answer the question using ONLY the following context (real product reviews + metadata).
     Always cite the product ASIN when possible.
