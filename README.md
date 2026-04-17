@@ -94,7 +94,7 @@ C --> D[Build Context]
 D --> E[Build Prompt]
 E --> F[Final Prompt = System Prompt + Context + Query]
 
-F --> G[Feed to LLM (Qwen3.5-2B)]
+F --> G[Feed to LLM - meta-llama/Meta-Llama-3-8B-Instruct]
 
 G --> H[Generated Response]
 
