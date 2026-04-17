@@ -100,6 +100,7 @@ G --> H[Generated Response]
 
 H --> I[Post-processing]
 I --> J[Final Recommendation]
+```
 
 ## Running the project locally
 
