@@ -86,7 +86,7 @@ Workflow:
 ```mermaid
 flowchart TD
 
-A[User Query] --> B[Retriever (FAISS vector store)]
+A[User Query] --> B[Retriever - FAISS vector store]
 B --> C[Retrieve Top-K relevant documents]
 
 C --> D[Build Context]
