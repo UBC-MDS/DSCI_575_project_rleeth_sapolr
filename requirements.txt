@@ -9,3 +9,7 @@ langchain
 langchain-core
 langchain-community
 langchain-huggingface
+transformers
+huggingface_hub
+python-dotenv
+torch
