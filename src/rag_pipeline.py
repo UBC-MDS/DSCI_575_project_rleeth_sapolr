@@ -5,6 +5,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_community.retrievers import BM25Retriever
+try:
+    from langchain.retrievers import EnsembleRetriever
+except ImportError:
+    from langchain_classic.retrievers import EnsembleRetriever
 
 from src.semantic import create_faiss_index
 from app.app import load_resources
@@ -25,8 +30,21 @@ class RAGPipeline:
 
         self.documents, self.bm25 = load_resources()
 
+        # Semantic retriever
         vectorstore = create_faiss_index(self.documents, 10000, reload_index=False)
-        self.retriever = vectorstore.as_retriever(search_kwargs={"k": top_k})
+        self.semantic_retriever = vectorstore.as_retriever(
+            search_kwargs={"k": top_k}
+        )
+
+        # BM25 retriever
+        self.bm25_retriever = BM25Retriever.from_documents(self.documents)
+        self.bm25_retriever.k = top_k
+
+        # Hybrid retriever
+        self.hybrid_retriever = EnsembleRetriever(
+            retrievers=[self.bm25_retriever, self.semantic_retriever],
+            weights=[0.4, 0.6]
+        )
 
         llm_endpoint = HuggingFaceEndpoint(
             repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
@@ -86,7 +104,7 @@ class RAGPipeline:
 
         rag_chain = (
             {
-                "context": self.retriever | format_context,
+                "context": self.hybrid_retriever | format_context,
                 "input": RunnablePassthrough()
             }
             | self.prompt
