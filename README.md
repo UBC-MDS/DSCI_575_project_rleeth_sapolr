@@ -16,14 +16,23 @@ Hugging Face: <https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023>
 
 ## EDA
 
-We performed the following EDA to inspect the datasets: - **Dataset size inspection:** Counted the number of records in both datasets (reviews and metadata). - **Field inspection:** Listed all available fields in the reviews and metadata datasets. - **Sample record inspection:** Printed example records from both datasets to understand the data structure and relationships between fields. - **Missing value analysis:** Calculated the percentage of missing values for each field to determine data completeness. - **Rating distribution analysis:** Visualized the distribution of review ratings to understand overall sentiment patterns in the dataset.
+We performed the following EDA to inspect the datasets: 
+- **Dataset size inspection:** Counted the number of records in both datasets (reviews and metadata).
+- **Field inspection:** Listed all available fields in the reviews and metadata datasets.
+- **Sample record inspection:** Printed example records from both datasets to understand the data structure and relationships between fields.
+- **Missing value analysis:** Calculated the percentage of missing values for each field to determine data completeness.
+- **Rating distribution analysis:** Visualized the distribution of review ratings to understand overall sentiment patterns in the dataset.
 
 ## Data Preprocessing
 
-We performed the following text preprocessing in the text_tokenizer function in the bm25.py script: - **Lowercasing**\
-All text was converted to lowercase to ensure that all tokens are treated as the same word. This reduces unnecessary vocabulary duplication and improves matching between queries and documents. - **Punctuation Removal**\
-Punctuation characters were removed using a regular expression. This ensures that all tokens are treated consistently and prevents punctuation from being included as part of tokens. - **Whitespace Tokenization**\
-After normalization, text was split into tokens using whitespace. - **Stopword Removal**\
+We performed the following text preprocessing in the text_tokenizer function in the bm25.py script: 
+- **Lowercasing**\
+All text was converted to lowercase to ensure that all tokens are treated as the same word. This reduces unnecessary vocabulary duplication and improves matching between queries and documents.
+- **Punctuation Removal**\
+Punctuation characters were removed using a regular expression. This ensures that all tokens are treated consistently and prevents punctuation from being included as part of tokens.
+- **Whitespace Tokenization**\
+After normalization, text was split into tokens using whitespace.
+- **Stopword Removal**\
 Common English stopwords (e.g., *the*, *and*, *is*, *to*) were removed to reduce noise in the tokenized corpus. These words appear frequently but provide little semantic value for distinguishing relevant documents.
 
 ## Retrieval Workflow
@@ -168,42 +177,34 @@ D --> E --> F --> G --> H
 ## Context Building
 
 The context includes:
-
 -   Product ASIN
-
 -   Product title
-
 -   Product rating
-
 -   Product review text
-
 This context is formatted into a structured block before being passed to the LLM.
 
 ## Prompt Template
 
 The prompt includes:
-
 -   A system instruction guiding the LLM to act as an Amazon product recommendation assistant
-
 -   Retrieved context from relevant reviews
-
 -   The user query
 
 The prompt enforces strict output constraints:
-
 -   Recommend exactly one product
-
 -   Use only the provided context (no external knowledge)
-
 -   Output must be valid JSON
-
 -   The recommendation reason must contain exactly two complete sentences
 
 This ensures consistent, structured, and grounded responses from the LLM.
 
+The RAG implementation in `src/rag_pipeline.py` supports both semantic retrieval (FAISS) and hybrid retrieval (BM25 + semantic), which can be selected in the application.
+
 ## Running the project locally
 
-Follow the steps below to set up the project and run it locally 1. Clone the repository
+Follow the steps below to set up the project and run it locally 
+
+1. Clone the repository
 
 Run the following commands in your terminal to clone the repository to your local machine:
 
@@ -214,7 +215,7 @@ cd <DSCI_575_project_rleeth_sapolr>
 
 2.  Install the project environment
 
-Navigate to the root of the project dirctory and run:
+Navigate to the root of the project directory and run:
 
 ``` bash
 conda env create -f environment_local.yml
