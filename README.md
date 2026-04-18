@@ -81,6 +81,27 @@ Workflow:
    - For each product, the lowest FAISS distance score (best semantic match) is kept.
    - The top-k unique products are returned.
 
+### RAG Pipeline Workflow
+
+```mermaid
+flowchart TD
+
+A[User Query] --> B[Retriever - FAISS vector store]
+B --> C[Retrieve Top-K relevant documents]
+
+C --> D[Build Context]
+
+D --> E[Build Prompt]
+E --> F[Final Prompt = System Prompt + Context + Query]
+
+F --> G[Feed to LLM - meta-llama/Meta-Llama-3-8B-Instruct]
+
+G --> H[Generated Response]
+
+H --> I[Post-processing]
+I --> J[Final Recommendation]
+```
+
 ## Running the project locally
 
 Follow the steps below to set up the project and run it locally

@@ -2,8 +2,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
 
-def semantic_search(documents, query, k=5, sample_size=None, reload_index=False):
-    
+def create_faiss_index(documents, sample_size=None, reload_index=False):
     embedding_model = HuggingFaceEmbeddings(
         model_name="all-MiniLM-L6-v2"
     )
@@ -28,6 +27,10 @@ def semantic_search(documents, query, k=5, sample_size=None, reload_index=False)
         )
 
         vectorstore.save_local(index_path)
+    return vectorstore
+
+def semantic_search(documents, query, k=5, sample_size=None, reload_index=False):
+    vectorstore = create_faiss_index(documents, sample_size, reload_index)
 
     results = vectorstore.similarity_search_with_score(query, k=len(documents))
 
