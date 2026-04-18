@@ -11,18 +11,18 @@ Another advantage of this model is that it is instruction-tuned, which makes it 
 Overall, Meta-Llama-3-8B-Instruct provides a strong balance between response quality, instruction-following capability, and deployment practicality. Its ability to generate high-quality, context-aware responses makes it a suitable choice for a RAG-based product recommendation system deployed as a web application.
 
 ## **2.3 System Prompt Exploration and Variants**
+
 ## Prompt Design and Iteration
 
 When we were developing the system prompt, we experimented with different variants to improve the quality and consistency of the generated recommendations and output format. The main challenges we experienced was ensuring that the model followed the required output format, stayed grounded in the provided context, and avoided generating unnecessary reasoning or extra text.
 
 ### Initial Prompt
-The initial prompt we used was provided in the Milestone 2 guide and focused on instructing the model to act as an Amazon shopping assistant and answer using only the provided context. While this worked reasonably well, the model often:
-- Included additional explanations beyond the required format  
-- Repeated parts of the prompt  
-- Generated verbose or inconsistent outputs that was not formatted with the required product metadata
-Sample prompt: 
 
-```text
+The initial prompt we used was provided in the Milestone 2 guide and focused on instructing the model to act as an Amazon shopping assistant and answer using only the provided context. While this worked reasonably well, the model often: - Included additional explanations beyond the required format\
+- Repeated parts of the prompt\
+- Generated verbose or inconsistent outputs that was not formatted with the required product metadata Sample prompt:
+
+``` text
 You are a helpful Amazon shopping assistant.
 Answer the question using ONLY the following context (real product reviews + metadata).
 Always cite the product ASIN when possible.
@@ -34,13 +34,14 @@ Answer based on the Amazon datasets:
 ```
 
 ### Structured Output Prompt
-We then introduced a stricter format by explicitly specifying the expected output structure in the prompt to include the metadata (Product Title, ASIN, Rating, Review, and Reason). This improved consistency, but the model still occasionally:
-- Added extra text before or after the answer  
-- Produced reasoning-style outputs or step-by-step explanations  
+
+We then introduced a stricter format by explicitly specifying the expected output structure in the prompt to include the metadata (Product Title, ASIN, Rating, Review, and Reason). This improved consistency, but the model still occasionally: - Added extra text before or after the answer\
+- Produced reasoning-style outputs or step-by-step explanations\
 - When using the Qwen3.5-2B model, the output still showed the thought process of the large language model
 
-Sample prompt: 
-```text
+Sample prompt:
+
+``` text
 You are a helpful Amazon shopping assistant.
 Answer the question using ONLY the following context (real product reviews + metadata).
 Always cite the product ASIN when possible.
@@ -63,13 +64,15 @@ Reason for Recommendation: Write 2 natural sentences describing the product’s 
 END
 ```
 
----
+------------------------------------------------------------------------
 
 ### Final Prompt (Selected - Online Model: Llama 3 8B)
+
 After switching to the online model (Meta-Llama-3-8B-Instruct), we further refined the prompt to enforce stricter structure and reduce formatting issues. Instead of relying on labeled text output, we moved to a JSON format, which proved to be more reliable for this model.
 
-Sample prompt: 
-```text
+Sample prompt:
+
+``` text
 You are a helpful Amazon shopping assistant.
 You must answer using ONLY the information in the context.
 
@@ -95,19 +98,62 @@ Return exactly in this format:
 }
 ```
 
+### Key Findings
+
+This final version produced the most reliable results, with: - Consistent and structured outputs\
+- Better adherence to the required format\
+- More natural and concise recommendations
+
+------------------------------------------------------------------------
 
 ### Key Findings
-This final version produced the most reliable results, with:
-- Consistent and structured outputs  
-- Better adherence to the required format  
-- More natural and concise recommendations  
 
----
-
-### Key Findings
-- Providing a strict output format significantly improves consistency  
-- JSON output works better than labeled text for some models (e.g., Llama)  
-- Adding explicit constraints (e.g., no extra text, fixed structure) helps reduce unwanted generation behavior  
-- Different models require different prompt strategies (e.g., handling `<think>` in Qwen vs enforcing JSON for Llama)  
+-   Providing a strict output format significantly improves consistency\
+-   JSON output works better than labeled text for some models (e.g., Llama)\
+-   Adding explicit constraints (e.g., no extra text, fixed structure) helps reduce unwanted generation behavior\
+-   Different models require different prompt strategies (e.g., handling `<think>` in Qwen vs enforcing JSON for Llama)
 
 Overall, iterative prompt refinement was essential in achieving stable and usable outputs for the RAG-based recommendation system.
+
+## **5.1 RAG Evaluation**
+
+### **Manual / Qualitative Evaluation for Hybrid RAG Workflow**
+Query: fit me concealer
+{'product_title': 'Boo-Boo Cover-Up Healing Concealer, Medium, 0.13 Ounce', 'product_asin': 'B07FX823ZQ', 'product_rating': '5.0', 'product_review': 'Love it!!', 'reason_for_recommendation': 'This product is highly rated with a 5.0 rating and multiple reviewers have experienced positive results, indicating high effectiveness. It is suitable for concealing and has received glowing reviews from customers.'}
+
+Query: something to keep your face moisturized all day
+{'product_title': 'Hyaluronic Acid Serum for face - 11% Low molecules Anti-aging Hydrating Booster Serum 100% Pure Hyaluronic Acid', 'product_asin': 'B087D1YQ2H', 'product_rating': '5.0', 'product_review': 'This is one of the better HA products that I’ve used. It’s great for keeping my skin hydrated all day and hiding fine lines.', 'reason_for_recommendation': "This product is suitable because it's great for keeping my skin hydrated all day and hiding fine lines. It can be used at night and in the morning under make up."}
+
+Query: makeup to cover up pimples
+{
+    "product_title": "Pimple Master Patch 120Count Hydrocolloid Bandages Acne Spot Treatment Absorbing Zit Cover Healing Dots by UNGLINGA, Drug-free Non-drying, 12mm",
+    "product_asin": "B00R2JOSDC",
+    "product_rating": "4.0",
+    "product_review": "We purchased as a birthday gift, but did not come in time. Actually we should have ordered it at an earlier date.  So now we have put it up until Christmas of this year.  Will give it then.  It looks very nice and we are well pleased.",
+    "reason_for_recommendation": "This product is a hydrocolloid
+
+Query: best sunscreen for scuba diving in tropical regions
+{'product_title': 'Tropical Sands All Natural Biodegradable Water Resistant Sunscreen - SPF 8 - 8 fl Oz - Great for Snorkeling - Reef Safe!', 'product_asin': 'B0184F8LNK', 'product_rating': '5.0', 'product_review': 'Loved this sunscreen. Other types have broke my skin out but no problems  with this.', 'reason_for_recommendation': 'This sunscreen is suitable for snorkeling and is reef safe. It is also loved by a customer with an olive complexion who uses it for extended periods in tropical regions.'}
+
+Query: good cleanser for busy working professionals who do not have time
+{'product_title': 'Hibiclens Antiseptic & Antimicrobial Skin Cleanser 32 Fl Oz (Pack of 2)', 'product_asin': 'B0149YNDP6', 'product_rating': '5.0', 'product_review': 'If ok for medical professionals definitely ok for me', 'reason_for_recommendation': 'This cleanser is perfect for busy working professionals who do not have time as it can be used quickly and efficiently. It is also suitable for medical professionals, indicating its effectiveness and reliability.'}
+
+| Query | Accuracy | Completeness | Fluency |
+|----------------|----------------|------------------------|----------------|
+| fit me concealer | Yes | No | Yes |
+| something to keep your face moisturized all day | Yes | Yes | Yes |
+| makeup to cover up pimples | No | No | Yes |
+| best sunscreen for scuba diving in tropical regions | Yes | Yes | Yes |
+| good cleanser for busy working professionals who do not have time | Yes | Yes | Yes |
+
+Key observations:
+
+The hybrid RAG system tends to perform well for descriptive queries since it successfully retrieves relevant products and the response is clear and easy to read. However, when certain keywords need to be matched such as "fit me concealer" which is a specific product name, it struggles to return the intended item.
+
+2 Limitations of Hybrid RAG workflow:
+
+One limitation of the Hybrid RAG system is that it sometimes retrieves semantically similar but incorrect products, especially for keyword-based queries such as "fit me concealer" as discussed previously. Another limitation is that the model still does not fully address all conditions for complex queries such as "make up to cover up pimples" since the model still suggests pimple patches instead of actual makeup.
+
+Suggestions for improving workflow's performance:
+
+I would suggest to refine the hybrid retriever by adjusting the weights between BM25 and semantic search to see if the model improves the suggestion or not, especially those with specific keywords/ specific conditions. Also, the prompt could be improved to enforce keyword matching if needed to ensure more accurate and complete responses. Also, more HuggingFace models with different capacities could be used to see if there is a major improvement in product suggestions.

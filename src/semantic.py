@@ -49,3 +49,7 @@ def semantic_search(documents, query, k=5, sample_size=None, reload_index=False)
 
     results = [(product_docs[asin], score) for asin, score in ranked_products]
     return results
+    
+# To speed up Streamlit
+def load_vectorstore(documents, sample_size=10000):
+    return create_faiss_index(documents, sample_size=sample_size, reload_index=False)
