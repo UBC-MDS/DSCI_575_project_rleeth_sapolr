@@ -3,11 +3,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 from typing import Any
-import json
-import gzip
 
 import streamlit as st
-from langchain_core.documents import Document
 
 # Make project root importable when running: streamlit run app/app.py
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,125 +14,10 @@ if str(ROOT) not in sys.path:
 # Project imports
 from src.bm25 import bm25_search, build_bm25
 from src.semantic import semantic_search
-
+from src.data_loader import load_documents
+from src.rag_pipeline import RAGPipeline
 
 st.set_page_config(page_title="Beauty Product Search", layout="wide")
-
-
-# ---------- Paths ----------
-RAW_DIR = ROOT / "data" / "raw"
-PROCESSED_DIR = ROOT / "data" / "processed"
-
-REVIEWS_PATH = RAW_DIR / "All_Beauty.jsonl"
-META_PATH = RAW_DIR / "meta_All_Beauty.jsonl"
-SAMPLE_DOCS_PATH = PROCESSED_DIR / "sample_documents.jsonl.gz"
-
-
-# ---------- File loading ----------
-def load_jsonl(path: Path) -> list[dict[str, Any]]:
-    data = []
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                data.append(json.loads(line))
-    return data
-
-
-def load_gz_jsonl(path: Path) -> list[dict[str, Any]]:
-    data = []
-    with gzip.open(path, "rt", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                data.append(json.loads(line))
-    return data
-
-
-# ---------- Data loading ----------
-@st.cache_data
-def load_raw_data() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    reviews = load_jsonl(REVIEWS_PATH)
-    meta = load_jsonl(META_PATH)
-    return reviews, meta
-
-
-def build_documents_from_rows(rows: list[dict[str, Any]]) -> list[Document]:
-    documents: list[Document] = []
-
-    for row in rows:
-        review_text = (row.get("product_review") or "").strip()
-        if not review_text:
-            continue
-
-        documents.append(
-            Document(
-                page_content=review_text,
-                metadata={
-                    "asin": row.get("asin", "N/A"),
-                    "product_review": review_text,
-                    "product_title": row.get("product_title", "Unknown product"),
-                    "product_rating": row.get("product_rating", "N/A"),
-                },
-            )
-        )
-
-    return documents
-
-
-@st.cache_data
-def build_documents_from_raw() -> list[Document]:
-    reviews, meta = load_raw_data()
-
-    meta_by_parent_asin = {
-        item.get("parent_asin"): item
-        for item in meta
-        if item.get("parent_asin") is not None
-    }
-
-    documents: list[Document] = []
-    for review in reviews:
-        parent_asin = review.get("parent_asin")
-        if not parent_asin or parent_asin not in meta_by_parent_asin:
-            continue
-
-        product_metadata = meta_by_parent_asin[parent_asin]
-        review_text = (review.get("text") or "").strip()
-
-        if not review_text:
-            continue
-
-        documents.append(
-            Document(
-                page_content=review_text,
-                metadata={
-                    "asin": parent_asin,
-                    "product_review": review_text,
-                    "product_title": product_metadata.get("title", "Unknown product"),
-                    "product_rating": review.get("rating", "N/A"),
-                },
-            )
-        )
-
-    return documents
-
-
-@st.cache_data
-def load_documents() -> list[Document]:
-    # Prefer the small sampled file for Streamlit Cloud
-    if SAMPLE_DOCS_PATH.exists():
-        rows = load_gz_jsonl(SAMPLE_DOCS_PATH)
-        return build_documents_from_rows(rows)
-
-    # Fall back to raw data for local runs
-    if REVIEWS_PATH.exists() and META_PATH.exists():
-        return build_documents_from_raw()
-
-    raise FileNotFoundError(
-        f"Could not find sample file {SAMPLE_DOCS_PATH} "
-        f"or raw files {REVIEWS_PATH} and {META_PATH}."
-    )
-
 
 @st.cache_resource
 def load_bm25_index():
@@ -148,7 +30,10 @@ def load_resources():
     documents = load_documents()
     bm25 = load_bm25_index()
     return documents, bm25
-
+    
+@st.cache_resource
+def load_rag_pipeline():
+    return RAGPipeline(top_k=3)
 
 # ---------- Helpers ----------
 def truncate_text(text: str, max_chars: int = 200) -> str:
@@ -252,76 +137,114 @@ def render_rating(rating: Any) -> str:
 
 # ---------- UI ----------
 st.title("Interactive Beauty Product Search")
-st.write("Search with BM25, Semantic Search, or Hybrid retrieval.")
+st.write("Search with BM25, Semantic Search, Hybrid retrieval, or use RAG mode.")
 
-mode = st.radio(
-    "Search mode",
-    ["BM25", "Semantic", "Hybrid"],
-    horizontal=True,
-)
+tab_search, tab_rag = st.tabs(["Search", "RAG"])
 
-query = st.text_input(
-    "Enter your query",
-    placeholder="e.g. makeup to cover up pimples",
-)
+with tab_search:
+    st.subheader("Search Only")
+    mode = st.radio(
+        "Search mode",
+        ["BM25", "Semantic", "Hybrid"],
+        horizontal=True,
+    )
+    
+    query = st.text_input(
+        "Enter your query",
+        placeholder="e.g. makeup to cover up pimples",
+    )
+    
+    top_k = st.slider("Number of results", min_value=1, max_value=3, value=3)
+    
+    search_clicked = st.button("Search", type="primary")
+    
+    if search_clicked:
+        if not query.strip():
+            st.warning("Please enter a query.")
+            st.stop()
+    
+        documents, bm25 = load_resources()
+    
+        with st.spinner("Searching..."):
+            if mode == "BM25":
+                raw_results = bm25_search(bm25, documents, query, k=10)
+                results = deduplicate_results(
+                    [format_result(r) for r in raw_results],
+                    top_k=top_k,
+                )
+    
+            elif mode == "Semantic":
+                raw_results = semantic_search(
+                    documents,
+                    query,
+                    k=10,
+                    sample_size=10000,
+                    reload_index=False,
+                )
+                results = deduplicate_results(
+                    [format_result(r) for r in raw_results],
+                    top_k=top_k,
+                )
+    
+            else:
+                bm25_raw = bm25_search(bm25, documents, query, k=10)
+                semantic_raw = semantic_search(
+                    documents,
+                    query,
+                    k=10,
+                    sample_size=10000,
+                    reload_index=False,
+                )
+                results = hybrid_search_results(bm25_raw, semantic_raw, top_k=top_k)
 
-top_k = st.slider("Number of results", min_value=1, max_value=3, value=3)
-
-search_clicked = st.button("Search", type="primary")
-
-if search_clicked:
-    if not query.strip():
-        st.warning("Please enter a query.")
-        st.stop()
-
-    documents, bm25 = load_resources()
-
-    with st.spinner("Searching..."):
-        if mode == "BM25":
-            raw_results = bm25_search(bm25, documents, query, k=10)
-            results = deduplicate_results(
-                [format_result(r) for r in raw_results],
-                top_k=top_k,
-            )
-
-        elif mode == "Semantic":
-            raw_results = semantic_search(
-                documents,
-                query,
-                k=10,
-                sample_size=10000,
-                reload_index=False,
-            )
-            results = deduplicate_results(
-                [format_result(r) for r in raw_results],
-                top_k=top_k,
-            )
-
+        st.subheader(f"Top {len(results)} Results")
+    
+        if not results:
+            st.info("No results found.")
         else:
-            bm25_raw = bm25_search(bm25, documents, query, k=10)
-            semantic_raw = semantic_search(
-                documents,
-                query,
-                k=10,
-                sample_size=10000,
-                reload_index=False,
-            )
-            results = hybrid_search_results(bm25_raw, semantic_raw, top_k=top_k)
+            for idx, result in enumerate(results, start=1):
+                with st.container(border=True):
+                    st.markdown(f"### {idx}. {result['title']}")
+                    col1, col2 = st.columns([3, 2])
+    
+                    with col1:
+                        st.write(f"**Review:** {result['review_text']}")
+                        st.write(f"**ASIN:** {result['asin']}")
+    
+                    with col2:
+                        st.write(f"**Rating:** {render_rating(result['rating'])}")
+                        st.write(f"**Retrieval score:** {result['score']:.4f}")
+                        
+# Add RAG mode                        
+with tab_rag:
+    st.subheader("RAG Mode")
 
-    st.subheader(f"Top {len(results)} Results")
+    rag_query = st.text_input(
+        "Enter your product question",
+        placeholder="e.g. something to keep your face moisturized all day",
+        key="rag_query",
+    )
 
-    if not results:
-        st.info("No results found.")
-    else:
-        for idx, result in enumerate(results, start=1):
+    rag_clicked = st.button("Generate Recommendation", type="primary", key="rag_button")
+
+    if rag_clicked:
+        if not rag_query.strip():
+            st.warning("Please enter a query.")
+            st.stop()
+
+        rag = load_rag_pipeline()
+
+        with st.spinner("Generating answer..."):
+            answer = rag.ask(rag_query)
+
+        st.markdown("## Recommended Product")
+
+        if isinstance(answer, dict):
             with st.container(border=True):
-                st.markdown(f"### {idx}. {result['title']}")
-                col1, col2 = st.columns([3, 2])
-
-                with col1:
-                    st.write(f"**Review:** {result['review_text']}")
-                    st.write(f"**ASIN:** {result['asin']}")
-
-                with col2:
-                    st.write(f"**Rating:** {render_rating(result['rating'])}")
-                    st.write(f"**Retrieval score:** {result['score']:.4f}")
+                st.write(f"**Product Title:** {answer.get('product_title', 'N/A')}")
+                st.write(f"**ASIN:** {answer.get('product_asin', 'N/A')}")
+                st.write(f"**Rating:** {answer.get('product_rating', 'N/A')}")
+                st.write(f"**Review:** {truncate_text(answer.get('product_review', ''), 300)}")
+                st.write(f"**Reason:** {answer.get('reason_for_recommendation', 'N/A')}")
+        else:
+            st.write(answer)

@@ -12,7 +12,8 @@ except ImportError:
     from langchain_classic.retrievers import EnsembleRetriever
 
 from src.semantic import create_faiss_index
-from app.app import load_resources
+from src.data_loader import load_documents
+from src.bm25 import build_bm25
 
 from dotenv import load_dotenv
 import os
@@ -28,7 +29,8 @@ class RAGPipeline:
 
     def __init__(self, model_name="Qwen/Qwen3.5-2B", top_k=3):
 
-        self.documents, self.bm25 = load_resources()
+        self.documents = load_documents()
+        self.bm25 = build_bm25(self.documents)
 
         # Semantic retriever
         vectorstore = create_faiss_index(self.documents, 10000, reload_index=False)
