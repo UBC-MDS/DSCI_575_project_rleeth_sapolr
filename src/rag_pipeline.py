@@ -5,15 +5,10 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.retrievers import BM25Retriever
-try:
-    from langchain.retrievers import EnsembleRetriever
-except ImportError:
-    from langchain_classic.retrievers import EnsembleRetriever
 
 from src.semantic import create_faiss_index
 from src.data_loader import load_documents
-from src.bm25 import build_bm25
+from src.hybrid import create_hybrid_retriever
 
 from dotenv import load_dotenv
 import os
@@ -30,22 +25,14 @@ class RAGPipeline:
     def __init__(self, model_name="Qwen/Qwen3.5-2B", top_k=3):
 
         self.documents = load_documents()
-        self.bm25 = build_bm25(self.documents)
 
         # Semantic retriever
         vectorstore = create_faiss_index(self.documents, 10000, reload_index=False)
-        self.semantic_retriever = vectorstore.as_retriever(
-            search_kwargs={"k": top_k}
-        )
-
-        # BM25 retriever
-        self.bm25_retriever = BM25Retriever.from_documents(self.documents)
-        self.bm25_retriever.k = top_k
-
-        # Hybrid retriever
-        self.hybrid_retriever = EnsembleRetriever(
-            retrievers=[self.bm25_retriever, self.semantic_retriever],
-            weights=[0.4, 0.6]
+        self.hybrid_retriever = create_hybrid_retriever(
+            self.documents,
+            vectorstore,
+            top_k=top_k,
+            weights=(0.4, 0.6),
         )
 
         llm_endpoint = HuggingFaceEndpoint(
