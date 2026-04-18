@@ -224,6 +224,13 @@ with tab_rag:
         key="rag_query",
     )
 
+    rag_mode = st.radio(
+        "RAG retrieval method",
+        ["Hybrid", "Semantic"],
+        horizontal=True,
+        key="rag_mode",
+    )
+
     rag_clicked = st.button("Generate Recommendation", type="primary", key="rag_button")
 
     if rag_clicked:
@@ -234,7 +241,7 @@ with tab_rag:
         rag = load_rag_pipeline()
 
         with st.spinner("Generating answer..."):
-            answer = rag.ask(rag_query)
+            answer = rag.ask(rag_query, mode=rag_mode.lower())
 
         st.markdown("## Recommended Product")
 
