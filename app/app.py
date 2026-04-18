@@ -13,9 +13,10 @@ if str(ROOT) not in sys.path:
 
 # Project imports
 from src.bm25 import bm25_search, build_bm25
-from src.semantic import semantic_search
+from src.semantic import create_faiss_index
 from src.data_loader import load_documents
 from src.rag_pipeline import RAGPipeline
+from langchain_core.documents import Document
 
 st.set_page_config(page_title="Beauty Product Search", layout="wide")
 
@@ -34,6 +35,12 @@ def load_resources():
 @st.cache_resource
 def load_rag_pipeline():
     return RAGPipeline(top_k=3)
+
+@st.cache_resource
+def load_semantic_resources():
+    documents = load_documents()
+    vectorstore = create_faiss_index(documents, 10000, reload_index=False)
+    return documents, vectorstore
 
 # ---------- Helpers ----------
 def truncate_text(text: str, max_chars: int = 200) -> str:
@@ -174,13 +181,8 @@ with tab_search:
                 )
     
             elif mode == "Semantic":
-                raw_results = semantic_search(
-                    documents,
-                    query,
-                    k=10,
-                    sample_size=10000,
-                    reload_index=False,
-                )
+                documents, vectorstore = load_semantic_resources()
+                raw_results = vectorstore.similarity_search_with_score(query, k=10)
                 results = deduplicate_results(
                     [format_result(r) for r in raw_results],
                     top_k=top_k,
@@ -188,13 +190,10 @@ with tab_search:
     
             else:
                 bm25_raw = bm25_search(bm25, documents, query, k=10)
-                semantic_raw = semantic_search(
-                    documents,
-                    query,
-                    k=10,
-                    sample_size=10000,
-                    reload_index=False,
-                )
+
+                _, vectorstore = load_semantic_resources()
+                semantic_raw = vectorstore.similarity_search_with_score(query, k=10)
+                
                 results = hybrid_search_results(bm25_raw, semantic_raw, top_k=top_k)
 
         st.subheader(f"Top {len(results)} Results")
