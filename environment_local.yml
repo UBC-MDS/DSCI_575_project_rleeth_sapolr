@@ -32,6 +32,9 @@ dependencies:
   - openpyxl
   - scikit-surprise
   - streamlit
+  - python-dotenv
+  - huggingface_hub
+  - transformers
   - pip:
       - langchain-core
       - langchain-community
