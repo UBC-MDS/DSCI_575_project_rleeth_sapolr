@@ -11,14 +11,16 @@ from src.data_loader import load_documents
 from src.hybrid import create_hybrid_retriever
 
 from dotenv import load_dotenv
+import streamlit as st
 import os
 import json
 import re
 
 load_dotenv()
 
-token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-
+token = st.secrets.get("HUGGINGFACEHUB_API_TOKEN", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
+if not token:
+    raise ValueError("Missing HUGGINGFACEHUB_API_TOKEN. Set it in Streamlit secrets or local .env.")
 
 class RAGPipeline:
 
