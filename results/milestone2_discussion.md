@@ -118,6 +118,25 @@ Overall, iterative prompt refinement was essential in achieving stable and usabl
 ## **5.1 RAG Evaluation**
 
 ### **Manual / Qualitative Evaluation for Hybrid RAG Workflow**
+Query: fit me concealer
+{'product_title': 'Boo-Boo Cover-Up Healing Concealer, Medium, 0.13 Ounce', 'product_asin': 'B07FX823ZQ', 'product_rating': '5.0', 'product_review': 'Love it!!', 'reason_for_recommendation': 'This product is highly rated with a 5.0 rating and multiple reviewers have experienced positive results, indicating high effectiveness. It is suitable for concealing and has received glowing reviews from customers.'}
+
+Query: something to keep your face moisturized all day
+{'product_title': 'Hyaluronic Acid Serum for face - 11% Low molecules Anti-aging Hydrating Booster Serum 100% Pure Hyaluronic Acid', 'product_asin': 'B087D1YQ2H', 'product_rating': '5.0', 'product_review': 'This is one of the better HA products that I’ve used. It’s great for keeping my skin hydrated all day and hiding fine lines.', 'reason_for_recommendation': "This product is suitable because it's great for keeping my skin hydrated all day and hiding fine lines. It can be used at night and in the morning under make up."}
+
+Query: makeup to cover up pimples
+{
+    "product_title": "Pimple Master Patch 120Count Hydrocolloid Bandages Acne Spot Treatment Absorbing Zit Cover Healing Dots by UNGLINGA, Drug-free Non-drying, 12mm",
+    "product_asin": "B00R2JOSDC",
+    "product_rating": "4.0",
+    "product_review": "We purchased as a birthday gift, but did not come in time. Actually we should have ordered it at an earlier date.  So now we have put it up until Christmas of this year.  Will give it then.  It looks very nice and we are well pleased.",
+    "reason_for_recommendation": "This product is a hydrocolloid
+
+Query: best sunscreen for scuba diving in tropical regions
+{'product_title': 'Tropical Sands All Natural Biodegradable Water Resistant Sunscreen - SPF 8 - 8 fl Oz - Great for Snorkeling - Reef Safe!', 'product_asin': 'B0184F8LNK', 'product_rating': '5.0', 'product_review': 'Loved this sunscreen. Other types have broke my skin out but no problems  with this.', 'reason_for_recommendation': 'This sunscreen is suitable for snorkeling and is reef safe. It is also loved by a customer with an olive complexion who uses it for extended periods in tropical regions.'}
+
+Query: good cleanser for busy working professionals who do not have time
+{'product_title': 'Hibiclens Antiseptic & Antimicrobial Skin Cleanser 32 Fl Oz (Pack of 2)', 'product_asin': 'B0149YNDP6', 'product_rating': '5.0', 'product_review': 'If ok for medical professionals definitely ok for me', 'reason_for_recommendation': 'This cleanser is perfect for busy working professionals who do not have time as it can be used quickly and efficiently. It is also suitable for medical professionals, indicating its effectiveness and reliability.'}
 
 | Query | Accuracy | Completeness | Fluency |
 |----------------|----------------|------------------------|----------------|
