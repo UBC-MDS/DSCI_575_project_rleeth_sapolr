@@ -18,18 +18,35 @@ import re
 
 load_dotenv()
 
-token = st.secrets.get("HUGGINGFACEHUB_API_TOKEN", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
-if not token:
-    raise ValueError("Missing HUGGINGFACEHUB_API_TOKEN. Set it in Streamlit secrets or local .env.")
+token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
+if not token:
+    try:
+        token = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
+    except Exception:
+        token = None
+
+if not token:
+    raise ValueError(
+        "Missing HUGGINGFACEHUB_API_TOKEN. "
+        "Set it in a local .env file or in Streamlit secrets."
+    )
+    
 class RAGPipeline:
 
     def __init__(self, model_name="Qwen/Qwen3.5-2B", top_k=3):
 
         self.documents = load_documents()
 
-        # Semantic retriever
+        # Create vector store
         vectorstore = create_faiss_index(self.documents, 10000, reload_index=False)
+        
+        # Semantic retriever
+        self.semantic_retriever = vectorstore.as_retriever(
+            search_kwargs={"k": top_k}
+        )
+        
+        # Hybrid retriever
         self.hybrid_retriever = create_hybrid_retriever(
             self.documents,
             vectorstore,
@@ -47,7 +64,8 @@ class RAGPipeline:
 
         self.llm = ChatHuggingFace(llm=llm_endpoint)
 
-        self.rag_chain = self._build_chain()
+        self.semantic_chain = self._build_chain(self.semantic_retriever)
+        self.hybrid_chain = self._build_chain(self.hybrid_retriever)
 
     def build_context(self, docs):
         return "\n\n".join(
@@ -90,12 +108,12 @@ class RAGPipeline:
     """
     )
 
-    def _build_chain(self):
+    def _build_chain(self, retriever):
         format_context = RunnableLambda(self.build_context)
 
         rag_chain = (
             {
-                "context": self.hybrid_retriever | format_context,
+                "context": retriever | format_context,
                 "input": RunnablePassthrough()
             }
             | self.prompt
@@ -105,15 +123,19 @@ class RAGPipeline:
 
         return rag_chain
 
-    def ask(self, query):
-
-        response = self.rag_chain.invoke(query)
-
+    def ask(self, query, mode="hybrid"):
+        if mode == "semantic":
+            response = self.semantic_chain.invoke(query)
+        elif mode == "hybrid":
+            response = self.hybrid_chain.invoke(query)
+        else:
+            raise ValueError("mode must be either 'semantic' or 'hybrid'")
+    
         match = re.search(r"\{.*\}", response, re.DOTALL)
         if match:
             try:
                 return json.loads(match.group(0))
-            except:
+            except json.JSONDecodeError:
                 return match.group(0)
-
+    
         return response
