@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
-
 # DSCI_575_project_rleeth_sapolr
 
 DSCI 575 Final Project Repository for Randall Lee and Paul Raadnui
@@ -22,25 +16,15 @@ Hugging Face: <https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023>
 
 ## EDA
 
-We performed the following EDA to inspect the datasets: - **Dataset size inspection:** Counted the number of records in both datasets (reviews and metadata).
-- **Field inspection:** Listed all available fields in the reviews and metadata datasets.
-- **Sample record inspection:** Printed example records from both datasets to understand the data structure and relationships between fields.
-- **Missing value analysis:** Calculated the percentage of missing values for each field to determine data completeness.
-- **Rating distribution analysis:** Visualized the distribution of review ratings to understand overall sentiment patterns in the dataset.
+We performed the following EDA to inspect the datasets: - **Dataset size inspection:** Counted the number of records in both datasets (reviews and metadata). - **Field inspection:** Listed all available fields in the reviews and metadata datasets. - **Sample record inspection:** Printed example records from both datasets to understand the data structure and relationships between fields. - **Missing value analysis:** Calculated the percentage of missing values for each field to determine data completeness. - **Rating distribution analysis:** Visualized the distribution of review ratings to understand overall sentiment patterns in the dataset.
 
 ## Data Preprocessing
 
 We performed the following text preprocessing in the text_tokenizer function in the bm25.py script: - **Lowercasing**\
-All text was converted to lowercase to ensure that all tokens are treated as the same word.
-This reduces unnecessary vocabulary duplication and improves matching between queries and documents.
-- **Punctuation Removal**\
-Punctuation characters were removed using a regular expression.
-This ensures that all tokens are treated consistently and prevents punctuation from being included as part of tokens.
-- **Whitespace Tokenization**\
-After normalization, text was split into tokens using whitespace.
-- **Stopword Removal**\
-Common English stopwords (e.g., *the*, *and*, *is*, *to*) were removed to reduce noise in the tokenized corpus.
-These words appear frequently but provide little semantic value for distinguishing relevant documents.
+All text was converted to lowercase to ensure that all tokens are treated as the same word. This reduces unnecessary vocabulary duplication and improves matching between queries and documents. - **Punctuation Removal**\
+Punctuation characters were removed using a regular expression. This ensures that all tokens are treated consistently and prevents punctuation from being included as part of tokens. - **Whitespace Tokenization**\
+After normalization, text was split into tokens using whitespace. - **Stopword Removal**\
+Common English stopwords (e.g., *the*, *and*, *is*, *to*) were removed to reduce noise in the tokenized corpus. These words appear frequently but provide little semantic value for distinguishing relevant documents.
 
 ## Retrieval Workflow
 
@@ -117,8 +101,7 @@ We initially experimented with smaller local models such as Qwen3.5-2B **but ult
 
 **Model Size Consideration:**
 
-The Llama 3 8B model contains approximately 8 billion parameters, making it significantly more powerful than smaller models like Qwen3.5-2B.
-This increased model size results in:
+The Llama 3 8B model contains approximately 8 billion parameters, making it significantly more powerful than smaller models like Qwen3.5-2B. This increased model size results in:
 
 \- Improved language understanding
 
@@ -134,20 +117,15 @@ The hybrid retrieval combines keyword-based BM25 and semantic search:
 
 **Workflow**:
 
-1\.
-Retrieve top-k results from BM25
+1\. Retrieve top-k results from BM25
 
-2\.
-Retrieve top-k results from FAISS semantic search
+2\. Retrieve top-k results from FAISS semantic search
 
-3\.
-Combine results using a weighted EnsembleRetriever from LangChain, which merges results from BM25 and semantic retrievers based on weighted scores (0.4 BM25, 0.6 semantic)
+3\. Combine results using a weighted EnsembleRetriever from LangChain, which merges results from BM25 and semantic retrievers based on weighted scores (0.4 BM25, 0.6 semantic)
 
-4\.
-Aggregate by product (asin)
+4\. Aggregate by product (asin)
 
-5\.
-Return top-k ranked products
+5\. Return top-k ranked products
 
 This approach improves retrieval by:
 
@@ -172,9 +150,9 @@ E[Build Context]
 
 F[Prompt Template]
 
-G[LLM]
+G[Feed to LLM]
 
-H[Final Answer]
+H[Final Recommendation]
 
 A --> B
 
@@ -225,8 +203,7 @@ This ensures consistent, structured, and grounded responses from the LLM.
 
 ## Running the project locally
 
-Follow the steps below to set up the project and run it locally 1.
-Clone the repository
+Follow the steps below to set up the project and run it locally 1. Clone the repository
 
 Run the following commands in your terminal to clone the repository to your local machine:
 
