@@ -161,7 +161,7 @@ We plan to deploy it using AWS which could separate storage, indexing, applicati
 
     -   BM25 index
 
-    For data storage, we plan to store raw Amazon review and product data in object storage such as Amazon S3 since it is suitable for storing large datasets. Processed data should also be stored in Amazon S3 and it should probably be stored in a structured format as Parquet to allow for efficient downstream loading. Vector index and BM25 index are relatively smaller in size compared to others. We could also store them in Amazon S3 but we would need to make sure to load them into EC2 when the app starts to allow for faster retrievals.
+    For data storage, we plan to store raw Amazon review and product data in object storage such as Amazon S3 since it is suitable for storing large datasets. This is important because Amazone review data are mostly large and static, so Amazon S3 is a good solution for storing such datasets. Processed data should also be stored in Amazon S3 and it should probably be stored in a structured format as Parquet to allow for efficient downstream loading. Vector index and BM25 index are relatively smaller in size compared to others. We could also store them in Amazon S3 but we would need to make sure to load them into EC2 when the app starts to allow for faster retrievals.
 
 2.  Compute
 
@@ -171,7 +171,7 @@ We plan to deploy it using AWS which could separate storage, indexing, applicati
 
     -   How will you handle LLM inference (API vs hosted model)?
 
-    The app deployed in Streamlit could run on an EC2 instance. EC2 would be suitable because it is easy to set up and it should be good enough to handle this Amazon dataset. When the server starts, it would load processed data, BM25, and FAISS indexes from S3. Then, users can access the app via EC2 public IP.
+    The app deployed in Streamlit could run on an EC2 instance. EC2 would be suitable because it is easy to set up and it should be good enough to handle this Amazon dataset. This setup is appropriate because our application mainly performs retrieval and API calls, so it does not require complex GPU infrastructure. When the server starts, it would load processed data, BM25, and FAISS indexes from S3. Then, users can access the app via EC2 public IP.
 
     One EC2 instance should be able to handle a few users at a time. However, if there are multiple users, we probably need to upgrade to a bigger EC2 instance. Or, we can run multiple instances with a load balancer.
 
@@ -183,6 +183,6 @@ We plan to deploy it using AWS which could separate storage, indexing, applicati
 
     -   How will your pipeline stay up to date?
 
-    When there are new products in production, we would upload new data to S3 and keep all versions of our data in S3. In other words, we would use a versioned structure to ensure data are not overwritten and allow for reproducibility and traceability. When new products come in, we would rerun the preprocessing script to clean data, generate embeddings, and update BM25 and FAISS indexes. Once these steps are done, the app will be reloaded based on these newly processed data. To reduce risk, we should also implement a validation system to check if the updated version is valid before having the app load based on updated data.
+    When there are new products/reviews in production, we would upload new data to S3 and keep all versions of our data in S3. In other words, we would use a versioned structure to ensure data are not overwritten and allow for reproducibility and traceability. When new products come in, we would rerun the preprocessing script to clean data, generate embeddings, and update BM25 and FAISS indexes. Once these steps are done, the app will be reloaded based on these newly processed data. To reduce risk, we should also implement a validation system to check if the updated version is valid before having the app load based on updated data.
 
-    In order to keep our pipeline stay up to date, we would need to schedule a frequent update based on how frequent new data come in. For instance, if new products come in weekly, we would schedule our update to be weekly as well.
+    In order to keep our pipeline stay up to date, we would need to schedule a frequent update based on how frequent new data come in. For instance, if new products come in weekly, we would schedule our update to be weekly as well. Index updates would be periodic batch re-indexing rather than real-time incremental updates which should be enough to update data regularly.
