@@ -21,15 +21,9 @@ from langchain_core.documents import Document
 st.set_page_config(page_title="Beauty Product Search", layout="wide")
 
 @st.cache_resource
-def load_bm25_index():
-    documents = load_documents()
-    return build_bm25(documents)
-
-
-@st.cache_resource
 def load_resources():
     documents = load_documents()
-    bm25 = load_bm25_index()
+    bm25 = build_bm25(documents)
     return documents, bm25
     
 @st.cache_resource
