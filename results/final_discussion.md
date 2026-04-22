@@ -133,9 +133,18 @@ Key Examples
 
 ### Documentation Update
 
--   Summary of `README` improvements
+- Summary of `README` improvements
+1. Added a Usage Examples section to the README explaining how to use both Search and RAG modes with example queries and outputs.
+2. Cleaned up environment_local.yml file so it contains only required libraries.
+3. Added links to notebooks and results to make the project easier to navigate and reproduce.
+4. Based on TA feedback, updated instructions to clone repository.
 
 ### Code Quality Changes
+1. Refactored code for better readability by standardizing function structure, naming, and formatting.
+2. Improved documentation by adding clear docstrings to all functions
+3. Reduced redundancy by modularizing logic (e.g., separating sampling, indexing, and retrieval functions).
+4. Based on TA feedback, optimized performance by introducing caching for BM25 and FAISS indexes to avoid recomputation
+5. Fixed bugs and inconsistencies, including argument ordering issues, index reuse logic, and sampling correctness (ASIN-based instead of review-based).
 
 -   Summary of cleanups
 
