@@ -54,7 +54,7 @@ Return exactly in this format:
 
 | Model Used | Prompt (Query) | Output (Product) | Key Observation |
 |------------|---------------|------------------|-----------------|
-| Meta-Llama-3-8B-Instruct | moisturizing shampoo for thick curly hair | Marc Anthony Instantly Thick Volumizing Conditioner 12.9oz (6 Pack) | Llama’s result is somewhat relevant (hair pro
+| Meta-Llama-3-8B-Instruct | moisturizing shampoo for thick curly hair | Marc Anthony Instantly Thick Volumizing Conditioner 12.9oz (6 Pack) | Llama’s result is somewhat relevant (hair product) while Qwen returned a brush, so Llama is better. |
 | Qwen2.5-7B-Instruct | moisturizing shampoo for thick curly hair | Detangler Brush Natural Boar Bristle, Set of 2, for Men, Women or Kids with Thick or Curly Hair | Qwen’s result is not a shampoo or conditioner, so it is less relevant than Llama. |
 | Meta-Llama-3-8B-Instruct | best product for dry skin | CeraVe Moisturizing Cream and Healing Ointment (1.89 oz) Bundle - Choose a 12 oz Tub or A 19 oz Tub (19 oz Tub with Healing Ointment) | Llama gave a very strong and relevant recommendation for dry skin. |
 | Qwen2.5-7B-Instruct | best product for dry skin | Lumene Vitamin C+ Dry Skin Comfort Radiance Cocktail - 1 fl oz. | Both are relevant, but Llama’s product is more directly associated with treating dry skin. |
