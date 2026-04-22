@@ -146,7 +146,6 @@ Key Examples
 4. Based on TA feedback, optimized performance by introducing caching for BM25 and FAISS indexes to avoid recomputation
 5. Fixed bugs and inconsistencies, including argument ordering issues, index reuse logic, and sampling correctness (ASIN-based instead of review-based).
 
--   Summary of cleanups
 
 ## Step 4: Cloud Deployment Plan
 
