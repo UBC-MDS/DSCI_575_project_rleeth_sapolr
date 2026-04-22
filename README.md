@@ -209,8 +209,8 @@ Follow the steps below to set up the project and run it locally
 Run the following commands in your terminal to clone the repository to your local machine:
 
 ``` bash
-git clone <https://github.com/UBC-MDS/DSCI_575_project_rleeth_sapolr.git>
-cd <DSCI_575_project_rleeth_sapolr>
+git clone https://github.com/UBC-MDS/DSCI_575_project_rleeth_sapolr.git
+cd DSCI_575_project_rleeth_sapolr
 ```
 
 2.  Install the project environment
