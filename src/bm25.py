@@ -3,8 +3,24 @@ from langchain_core.documents import Document
 from rank_bm25 import BM25Okapi
 import re
 from collections import defaultdict
+from pathlib import Path
+import pickle
+
+ROOT = Path(__file__).resolve().parents[1]
+RAW_DIR = ROOT / "data" / "raw"
+PROCESSED_DIR = ROOT / "data" / "processed"
+BM25_PATH = PROCESSED_DIR / "bm25_index.pkl"
+
 
 def text_tokenizer(text: str) -> list[str]:
+    """
+    Tokenize input text into a list of cleaned words.
+    This function lowercases the text, removes punctuation, splits into tokens, and filters out common stopwords.
+    Args:
+        text (str): Input text to tokenize.
+    Returns:
+        list[str]: List of processed tokens.
+    """
     stopwords = {
     "the","a","an","and","is","are","to","of","in",
     "for","on","with","this","that","it","be"
@@ -15,7 +31,19 @@ def text_tokenizer(text: str) -> list[str]:
     tokens = [t for t in tokens if t not in stopwords]
     return tokens
 
-def build_bm25(documents: list[Document]):
+def build_bm25(documents: list[Document], force_rebuild: bool = False):
+    """
+    Build or load a BM25 index from a list of documents.
+    If a saved BM25 index exists and force_rebuild is False, the index is loaded from disk. Otherwise, a new BM25 indexn is built and saved for future use.
+    Args:
+        documents (list[Document]): List of documents to index.
+        force_rebuild (bool): Whether to rebuild the index even if it exists.
+    Returns:
+        BM25Okapi: BM25 index built from the document corpus.
+    """
+    if BM25_PATH.exists() and not force_rebuild:
+        with open(BM25_PATH, "rb") as f:
+            return pickle.load(f)
 
     texts = [doc.page_content for doc in documents]
 
@@ -23,13 +51,27 @@ def build_bm25(documents: list[Document]):
         text_tokenizer(text)
         for text in texts
     ]
-
     bm25 = BM25Okapi(tokenized_corpus)
+
+    BM25_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(BM25_PATH, "wb") as f:
+        pickle.dump(bm25, f)
 
     return bm25
 
 def bm25_search(bm25, documents: list[Document], query: str, k=5):
-
+    """
+    Perform BM25 search and return top-k product-level results. The query is tokenized and scored against all documents.
+    Scores are aggregated at the product (ASIN) level by taking the highest scoring review per product.
+    Args:
+        bm25 (BM25Okapi): Pre-built BM25 index.
+        documents (list[Document]): List of documents corresponding to the index.
+        query (str): Search query.
+        k (int): Number of top products to return.
+    Returns:
+        list[tuple[Document, float]]: List of (document, score) pairs
+        representing the top-k ranked products.
+    """
     tokenized_query = text_tokenizer(query)
 
     scores = bm25.get_scores(tokenized_query)

@@ -16,6 +16,14 @@ RANDOM_SEED = 42
 
 
 def load_jsonl(path: Path):
+    """
+    Load a JSONL file into a list of dictionaries.
+    Each line in the file is parsed as a JSON object and added to a list.
+    Args:
+        path (Path): Path to the JSONL file.
+    Returns:
+        list[dict[str, Any]]: List of parsed JSON objects.
+    """
     rows = []
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
@@ -26,6 +34,13 @@ def load_jsonl(path: Path):
 
 
 def main():
+    """
+    Main function to create a sample of documents for the app.
+    Args:
+        None
+    Returns:
+        None
+    """
     reviews = load_jsonl(REVIEWS_PATH)
     meta = load_jsonl(META_PATH)
 

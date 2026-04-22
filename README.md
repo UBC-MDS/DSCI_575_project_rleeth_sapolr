@@ -209,8 +209,8 @@ Follow the steps below to set up the project and run it locally
 Run the following commands in your terminal to clone the repository to your local machine:
 
 ``` bash
-git clone <https://github.com/UBC-MDS/DSCI_575_project_rleeth_sapolr.git>
-cd <DSCI_575_project_rleeth_sapolr>
+git clone https://github.com/UBC-MDS/DSCI_575_project_rleeth_sapolr.git
+cd DSCI_575_project_rleeth_sapolr
 ```
 
 2.  Install the project environment
@@ -224,7 +224,7 @@ conda activate dsci-575-project
 
 ## API Key Setup
 
-To run the RAG pipeline, you must provide a Hugging Face API token.
+To run the RAG pipeline, you must provide a Hugging Face API token. If you do not have a Hugging Face API token, follow these [instructions](https://huggingface.co/docs/hub/en/security-tokens) to create one.
 
 ### Option 1 (recommended): .env file
 
@@ -249,3 +249,44 @@ streamlit run app/app.py
 The application will be available at `http://localhost:8501/` (or the port shown in your terminal).
 
 The deployed application is also available on <https://dsci-575-project-rleeth-sapolr.streamlit.app/>
+
+## Usage Examples
+The application supports two main modes: Search and RAG.
+
+### Search Mode
+Search mode retrieves relevant products based on your query using either of the 3 options:
+- BM25 (keyword search)
+- Semantic search (vector similarity)
+- Hybrid (combination of both)
+
+Example:
+1. Select Search tab
+2. Choose a search mode (BM25, Semantic, or Hybrid)
+3. Enter your query, for example `makeup to cover pimples`
+4. Click Search
+
+Output:
+- A list of top products
+- Each result includes:
+1. Product title
+2. ASIN
+3. Review snippet
+4. Rating
+5. Retrieval score
+
+### RAG Mode
+RAG (Retrieval-Augmented Generation) mode generates a single recommended product using retrieved reviews and an LLM.
+
+Example:
+1. Select RAG tab
+2. Choose retrieval method (Hybrid (recommended) or Semantic)
+3. Enter your query
+4. Click Generate Recommendation
+
+Output:
+- One recommended product with:
+1. Product title
+2. ASIN
+3. Rating
+4. Review snippet
+5. Reason for recommendation
