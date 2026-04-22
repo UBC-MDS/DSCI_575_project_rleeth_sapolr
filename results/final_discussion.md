@@ -53,27 +53,16 @@ Return exactly in this format:
 ## Model Comparison Results
 
 | Model Used | Prompt (Query) | Output (Product) | Key Observation |
-
 |------------|---------------|------------------|-----------------|
-
-| Meta-Llama-3-8B-Instruct | moisturizing shampoo for thick curly hair | Marc Anthony Instantly Thick Volumizing Conditioner 12.9oz (6 Pack) | Llama’s result is somewhat relevant (hair product), while Qwen returned a brush, so Llama is better. |
-
+| Meta-Llama-3-8B-Instruct | moisturizing shampoo for thick curly hair | Marc Anthony Instantly Thick Volumizing Conditioner 12.9oz (6 Pack) | Llama’s result is somewhat relevant (hair pro
 | Qwen2.5-7B-Instruct | moisturizing shampoo for thick curly hair | Detangler Brush Natural Boar Bristle, Set of 2, for Men, Women or Kids with Thick or Curly Hair | Qwen’s result is not a shampoo or conditioner, so it is less relevant than Llama. |
-
 | Meta-Llama-3-8B-Instruct | best product for dry skin | CeraVe Moisturizing Cream and Healing Ointment (1.89 oz) Bundle - Choose a 12 oz Tub or A 19 oz Tub (19 oz Tub with Healing Ointment) | Llama gave a very strong and relevant recommendation for dry skin. |
-
 | Qwen2.5-7B-Instruct | best product for dry skin | Lumene Vitamin C+ Dry Skin Comfort Radiance Cocktail - 1 fl oz. | Both are relevant, but Llama’s product is more directly associated with treating dry skin. |
-
 | Meta-Llama-3-8B-Instruct | something gentle for sensitive skin | Le Petit Marseillais Peony and Raspberry Extra Gentle Shower Cream | Llama clearly gave a better match for sensitive skin. |
-
 | Qwen2.5-7B-Instruct | something gentle for sensitive skin | Kastu Foot Peel Mask 2 Pack, Effective For Cracked Heels Repair, Remove Dead Skin, Callus and Dry Toe Skin, Soft Feet, Exfoliating Peeling Natural Treatment, Goat Milk Extract Moisturizes Feet Skin | Qwen’s result is not appropriate for general sensitive skin care, so Llama is better. |
-
 | Meta-Llama-3-8B-Instruct | ultra facial barrier-hydrating cleanser | Mary Kay Botanical Effects Facial Hydrate Formula 1 3 fl. oz. / 88 ml - Dry Skin | Both models returned the same relevant cleanser, so performance is equal. |
-
 | Qwen2.5-7B-Instruct | ultra facial barrier-hydrating cleanser | Mary Kay Botanical Effects Facial Hydrate Formula 1 3 fl. oz. / 88 ml - Dry Skin | Both models performed equally well for this query. |
-
 | Meta-Llama-3-8B-Instruct | best sunscreen for scuba diving in tropical regions | Badger - SPF 30 Lavender Clear Zinc Sunscreen Cream, 2.9 fl oz & SPF 35 Clear Zinc Sport Sunscreen Stick, Unscented, 0.65 oz, Water Resistant Reef Safe Sunscreen | Both models returned the same appropriate sunscreen, so performance is equal. |
-
 | Qwen2.5-7B-Instruct | best sunscreen for scuba diving in tropical regions | Badger - SPF 30 Lavender Clear Zinc Sunscreen Cream, 2.9 fl oz & SPF 35 Clear Zinc Sport Sunscreen Stick, Unscented, 0.65 oz, Water Resistant Reef Safe Sunscreen | Both models performed equally well for this query. |
 
 ## Step 2: Additional Feature (state which option you chose)
