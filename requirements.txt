@@ -13,3 +13,4 @@ transformers
 huggingface_hub
 python-dotenv
 torch
+torchvision
