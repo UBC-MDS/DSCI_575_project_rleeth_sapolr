@@ -35,6 +35,12 @@ if not token:
 class RAGPipeline:
 
     def __init__(self, model_name="Qwen/Qwen3.5-2B", top_k=3):
+        """
+        Initialize the RAGPipeline.
+        Args:
+            model_name (str): Name of the model to use.
+            top_k (int): Number of top results to return.
+        """
 
         self.documents = load_documents()
 
@@ -68,6 +74,13 @@ class RAGPipeline:
         self.hybrid_chain = self._build_chain(self.hybrid_retriever)
 
     def build_context(self, docs):
+        """
+        Build the context for the RAG pipeline.
+        Args:
+            docs (list[Document]): List of documents to build the context from.
+        Returns:
+            str: The context for the RAG pipeline.
+        """
         return "\n\n".join(
             f"Product ASIN: {doc.metadata.get('asin')}\n"
             f"Product Title: {doc.metadata.get('product_title')}\n"
@@ -109,6 +122,13 @@ class RAGPipeline:
     )
 
     def _build_chain(self, retriever):
+        """
+        Build the RAG chain.
+        Args:
+            retriever (Retriever): The retriever to use.
+        Returns:
+            Runnable: The RAG chain.
+        """
         format_context = RunnableLambda(self.build_context)
 
         rag_chain = (
@@ -124,6 +144,15 @@ class RAGPipeline:
         return rag_chain
 
     def ask(self, query, mode="hybrid"):
+        """
+        Run a query through the RAG pipeline and return a structured response.
+        This method routes the query to either the semantic or hybrid retrieval chain, then attempts to extract and parse a JSON object from the model output.
+        Args:
+            query (str): The query to ask.
+            mode (str): The retrieval mode to use.
+        Returns:
+            dict: The structured response from the RAG pipeline.
+        """
         if mode == "semantic":
             response = self.semantic_chain.invoke(query)
         elif mode == "hybrid":

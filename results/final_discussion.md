@@ -2,18 +2,68 @@
 
 ## Step 1: Improve Your Workflow
 
-### Dataset Scaling
+### 1.1 Dataset Scaling
+- Number of products used: 10,000 products [Results shown here](../notebooks/final_milestone_tests.ipynb)
+- Changes to sampling strategy (if any): 
+Initially, the dataset was sampled based on the number of reviews (documents), meaning the system would take the first N reviews regardless of which products they belonged to. This led to an imbalance where products with many reviews were overrepresented, while others were not included at all.
 
--   Number of products used
--   Changes to sampling strategy (if any)
+To address this, I changed the sampling strategy to be based on unique ASINs (products) instead of individual reviews. Specifically, I limited the dataset by selecting a fixed number of unique products and then including their associated reviews. This ensured that the sample better represented a diverse set of products rather than being dominated by a small number of highly reviewed items.
 
-### LLM Experiment
+In addition, I introduced a more controlled sampling process by explicitly filtering documents using product-level grouping before building the FAISS index. This made the retrieval process more balanced and improved the fairness of product recommendations across different queries.
 
--   Models compared (name, family, size)
--   Results and discussions
-    -   Prompt used (copy it here)
-    -   Results
--   Which model you chose and why
+Overall, this change helped reduce bias toward popular products and resulted in more consistent and meaningful retrieval results during both semantic search and RAG-based recommendations.
+
+### 1.2 LLM Experiment
+[Results shown here](../notebooks/final_milestone_tests.ipynb)
+
+## Models compared (name, family, size)
+- The models used to compare performance was Meta-Llama-3-8B-Instruct and Qwen2.5-7B-Instruct
+
+## Results and discussions
+- The results are highlighted below in the Model Comparison Results table
+- Prompt used:
+``` text
+You are a helpful Amazon shopping assistant.
+You must answer using ONLY the information in the context.
+
+- Recommend ONE product.
+- Do NOT use outside knowledge.
+- Do NOT include any extra text.
+- Return ONLY valid JSON.
+
+Context:
+{context}
+
+Question:
+{input}
+
+Return exactly in this format:
+
+{
+  "product_title": "",
+  "product_asin": "",
+  "product_rating": "",
+  "product_review": "",
+  "reason_for_recommendation": ""
+}
+```
+## Results
+- Based on the results, I chose Meta-Llama-3-8B-Instruct as the better overall model. It consistently produced more relevant and appropriate product recommendations, especially for queries that were more ambiguous or required understanding context, such as “something gentle for sensitive skin” and “moisturizing shampoo for thick curly hair.” In addition, it followed the prompt instructions more reliably, including returning properly structured outputs and clearer reasoning. While Qwen2.5-7B-Instruct performed well on more straightforward queries and sometimes returned the same correct product, it was less consistent overall and occasionally selected items that were not closely related to the user’s request.
+
+## Model Comparison Results
+
+| Model Used | Prompt (Query) | Output (Product) | Key Observation |
+|------------|---------------|------------------|-----------------|
+| Meta-Llama-3-8B-Instruct | moisturizing shampoo for thick curly hair | Marc Anthony Instantly Thick Volumizing Conditioner 12.9oz (6 Pack) | Llama’s result is somewhat relevant (hair product) while Qwen returned a brush, so Llama is better. |
+| Qwen2.5-7B-Instruct | moisturizing shampoo for thick curly hair | Detangler Brush Natural Boar Bristle, Set of 2, for Men, Women or Kids with Thick or Curly Hair | Qwen’s result is not a shampoo or conditioner, so it is less relevant than Llama. |
+| Meta-Llama-3-8B-Instruct | best product for dry skin | CeraVe Moisturizing Cream and Healing Ointment (1.89 oz) Bundle - Choose a 12 oz Tub or A 19 oz Tub (19 oz Tub with Healing Ointment) | Llama gave a very strong and relevant recommendation for dry skin. |
+| Qwen2.5-7B-Instruct | best product for dry skin | Lumene Vitamin C+ Dry Skin Comfort Radiance Cocktail - 1 fl oz. | Both are relevant, but Llama’s product is more directly associated with treating dry skin. |
+| Meta-Llama-3-8B-Instruct | something gentle for sensitive skin | Le Petit Marseillais Peony and Raspberry Extra Gentle Shower Cream | Llama clearly gave a better match for sensitive skin. |
+| Qwen2.5-7B-Instruct | something gentle for sensitive skin | Kastu Foot Peel Mask 2 Pack, Effective For Cracked Heels Repair, Remove Dead Skin, Callus and Dry Toe Skin, Soft Feet, Exfoliating Peeling Natural Treatment, Goat Milk Extract Moisturizes Feet Skin | Qwen’s result is not appropriate for general sensitive skin care, so Llama is better. |
+| Meta-Llama-3-8B-Instruct | ultra facial barrier-hydrating cleanser | Mary Kay Botanical Effects Facial Hydrate Formula 1 3 fl. oz. / 88 ml - Dry Skin | Both models returned the same relevant cleanser, so performance is equal. |
+| Qwen2.5-7B-Instruct | ultra facial barrier-hydrating cleanser | Mary Kay Botanical Effects Facial Hydrate Formula 1 3 fl. oz. / 88 ml - Dry Skin | Both models performed equally well for this query. |
+| Meta-Llama-3-8B-Instruct | best sunscreen for scuba diving in tropical regions | Badger - SPF 30 Lavender Clear Zinc Sunscreen Cream, 2.9 fl oz & SPF 35 Clear Zinc Sport Sunscreen Stick, Unscented, 0.65 oz, Water Resistant Reef Safe Sunscreen | Both models returned the same appropriate sunscreen, so performance is equal. |
+| Qwen2.5-7B-Instruct | best sunscreen for scuba diving in tropical regions | Badger - SPF 30 Lavender Clear Zinc Sunscreen Cream, 2.9 fl oz & SPF 35 Clear Zinc Sport Sunscreen Stick, Unscented, 0.65 oz, Water Resistant Reef Safe Sunscreen | Both models performed equally well for this query. |
 
 ## Step 2: Additional Feature (state which option you chose)
 
@@ -83,9 +133,18 @@ Key Examples
 
 ### Documentation Update
 
--   Summary of `README` improvements
+- Summary of `README` improvements
+1. Added a Usage Examples section to the README explaining how to use both Search and RAG modes with example queries and outputs.
+2. Cleaned up environment_local.yml file so it contains only required libraries.
+3. Added links to notebooks and results to make the project easier to navigate and reproduce.
+4. Based on TA feedback, updated instructions to clone repository.
 
 ### Code Quality Changes
+1. Refactored code for better readability by standardizing function structure, naming, and formatting.
+2. Improved documentation by adding clear docstrings to all functions
+3. Reduced redundancy by modularizing logic (e.g., separating sampling, indexing, and retrieval functions).
+4. Based on TA feedback, optimized performance by introducing caching for BM25 and FAISS indexes to avoid recomputation
+5. Fixed bugs and inconsistencies, including argument ordering issues, index reuse logic, and sampling correctness (ASIN-based instead of review-based).
 
 -   Summary of cleanups
 
