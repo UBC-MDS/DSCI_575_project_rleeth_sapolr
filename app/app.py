@@ -17,6 +17,7 @@ from src.semantic import create_faiss_index
 from src.data_loader import load_documents
 from src.rag_pipeline import RAGPipeline
 from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 
 st.set_page_config(page_title="Beauty Product Search", layout="wide")
 
@@ -33,7 +34,10 @@ def load_rag_pipeline():
 @st.cache_resource
 def load_semantic_resources():
     documents = load_documents()
-    vectorstore = create_faiss_index(documents, 10000, reload_index=False)
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="all-MiniLM-L6-v2"
+    )
+    vectorstore = create_faiss_index(documents, embedding_model, sample_size=10000, reload_index=False)
     return documents, vectorstore
 
 # ---------- Helpers ----------

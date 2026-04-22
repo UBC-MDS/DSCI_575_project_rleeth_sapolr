@@ -36,6 +36,18 @@ def load_gz_jsonl(path: Path) -> list[dict[str, Any]]:
                 data.append(json.loads(line))
     return data
 
+def save_documents_to_gz_jsonl(documents: list[Document], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(path, "wt", encoding="utf-8") as f:
+        for doc in documents:
+            row = {
+                "asin": doc.metadata.get("asin"),
+                "product_review": doc.metadata.get("product_review"),
+                "product_title": doc.metadata.get("product_title"),
+                "product_rating": doc.metadata.get("product_rating"),
+            }
+            f.write(json.dumps(row) + "\n")
+
 
 def load_raw_data() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     reviews = load_jsonl(REVIEWS_PATH)
@@ -66,7 +78,7 @@ def build_documents_from_rows(rows: list[dict[str, Any]]) -> list[Document]:
     return documents
 
 
-def build_documents_from_raw() -> list[Document]:
+def build_documents_from_raw(max_products: int | None = None) -> list[Document]:
     reviews, meta = load_raw_data()
 
     meta_by_parent_asin = {
@@ -76,10 +88,15 @@ def build_documents_from_raw() -> list[Document]:
     }
 
     documents: list[Document] = []
+    seen_asins: set[str] = set()
     for review in reviews:
         parent_asin = review.get("parent_asin")
         if not parent_asin or parent_asin not in meta_by_parent_asin:
             continue
+
+        if max_products is not None and parent_asin not in seen_asins:
+            if len(seen_asins) >= max_products:
+                break
 
         product_metadata = meta_by_parent_asin[parent_asin]
         review_text = (review.get("text") or "").strip()
@@ -98,7 +115,8 @@ def build_documents_from_raw() -> list[Document]:
                 },
             )
         )
-
+        seen_asins.add(parent_asin)
+    save_documents_to_gz_jsonl(documents, SAMPLE_DOCS_PATH)
     return documents
 
 
@@ -108,7 +126,7 @@ def load_documents() -> list[Document]:
         return build_documents_from_rows(rows)
 
     if REVIEWS_PATH.exists() and META_PATH.exists():
-        return build_documents_from_raw()
+        return build_documents_from_raw(max_products=10000)
 
     raise FileNotFoundError(
         f"Could not find sample file {SAMPLE_DOCS_PATH} "

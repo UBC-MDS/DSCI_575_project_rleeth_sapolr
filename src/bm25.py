@@ -3,6 +3,14 @@ from langchain_core.documents import Document
 from rank_bm25 import BM25Okapi
 import re
 from collections import defaultdict
+from pathlib import Path
+import pickle
+
+ROOT = Path(__file__).resolve().parents[1]
+RAW_DIR = ROOT / "data" / "raw"
+PROCESSED_DIR = ROOT / "data" / "processed"
+BM25_PATH = PROCESSED_DIR / "bm25_index.pkl"
+
 
 def text_tokenizer(text: str) -> list[str]:
     stopwords = {
@@ -15,7 +23,10 @@ def text_tokenizer(text: str) -> list[str]:
     tokens = [t for t in tokens if t not in stopwords]
     return tokens
 
-def build_bm25(documents: list[Document]):
+def build_bm25(documents: list[Document], force_rebuild: bool = False):
+    if BM25_PATH.exists() and not force_rebuild:
+        with open(BM25_PATH, "rb") as f:
+            return pickle.load(f)
 
     texts = [doc.page_content for doc in documents]
 
@@ -23,8 +34,11 @@ def build_bm25(documents: list[Document]):
         text_tokenizer(text)
         for text in texts
     ]
-
     bm25 = BM25Okapi(tokenized_corpus)
+
+    BM25_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(BM25_PATH, "wb") as f:
+        pickle.dump(bm25, f)
 
     return bm25
 
