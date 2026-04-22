@@ -79,7 +79,7 @@ Key Examples
 
         **Reason:** I recommend this makeup because it is great for acne coverage. It is also water proof and hypoallergenic which will help prevent any irritation to the skin around the pimples.
 
-Step 3: Improve Documentation and Code Quality
+## Step 3: Improve Documentation and Code Quality
 
 ### Documentation Update
 
