@@ -4,6 +4,7 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface import HuggingFaceEndpoint
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 
 from src.semantic import create_faiss_index
@@ -43,9 +44,17 @@ class RAGPipeline:
         """
 
         self.documents = load_documents()
-
+        self.embedding_model = HuggingFaceEmbeddings(
+            model_name="all-MiniLM-L6-v2"
+        )
+        
         # Create vector store
-        vectorstore = create_faiss_index(self.documents, 10000, reload_index=False)
+        vectorstore = create_faiss_index(
+            self.documents,
+            self.embedding_model,
+            sample_size=10000,
+            reload_index=False
+        )
         
         # Semantic retriever
         self.semantic_retriever = vectorstore.as_retriever(
