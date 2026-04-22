@@ -18,6 +18,14 @@ SAMPLE_DOCS_PATH = PROCESSED_DIR / "sample_documents.jsonl.gz"
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    """
+    Load a JSONL file into a list of dictionaries.
+    Each line in the file is parsed as a JSON object and added to a list.
+    Args:
+        path (Path): Path to the JSONL file.
+    Returns:
+        list[dict[str, Any]]: List of parsed JSON objects.
+    """
     data = []
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
@@ -28,6 +36,14 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def load_gz_jsonl(path: Path) -> list[dict[str, Any]]:
+    """
+    Load a gzip-compressed JSONL file into a list of dictionaries.
+    Each line in the file is parsed as a JSON object and added to a list.
+    Args:
+        path (Path): Path to the gzip-compressed JSONL file.
+    Returns:
+        list[dict[str, Any]]: List of parsed JSON objects.
+    """
     data = []
     with gzip.open(path, "rt", encoding="utf-8") as f:
         for line in f:
@@ -37,6 +53,15 @@ def load_gz_jsonl(path: Path) -> list[dict[str, Any]]:
     return data
 
 def save_documents_to_gz_jsonl(documents: list[Document], path: Path) -> None:
+    """
+    Save a list of documents to a gzip-compressed JSONL file.
+    Each document is converted to a JSON object and written to the file.
+    Args:
+        documents (list[Document]): List of documents to save.
+        path (Path): Path to the gzip-compressed JSONL file.
+    Returns:
+        None
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(path, "wt", encoding="utf-8") as f:
         for doc in documents:
@@ -50,12 +75,27 @@ def save_documents_to_gz_jsonl(documents: list[Document], path: Path) -> None:
 
 
 def load_raw_data() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """
+    Load raw review and metadata data from the JSONL files.
+    Args:
+        None
+    Returns:
+        tuple[list[dict[str, Any]], list[dict[str, Any]]]: Tuple of lists of review and metadata dictionaries.
+    """
     reviews = load_jsonl(REVIEWS_PATH)
     meta = load_jsonl(META_PATH)
     return reviews, meta
 
 
 def build_documents_from_rows(rows: list[dict[str, Any]]) -> list[Document]:
+    """
+    Build a list of documents from a list of dictionaries.
+    Each dictionary is converted to a Document object and added to the list.
+    Args:
+        rows (list[dict[str, Any]]): List of dictionaries to convert to documents.
+    Returns:
+        list[Document]: List of Document objects.
+    """
     documents: list[Document] = []
 
     for row in rows:
@@ -79,6 +119,13 @@ def build_documents_from_rows(rows: list[dict[str, Any]]) -> list[Document]:
 
 
 def build_documents_from_raw(max_products: int | None = None) -> list[Document]:
+    """
+    Build a list of documents from raw review and metadata data.
+    Args:
+        max_products (int | None): Maximum number of products to include.
+    Returns:
+        list[Document]: List of Document objects.
+    """
     reviews, meta = load_raw_data()
 
     meta_by_parent_asin = {
@@ -121,6 +168,13 @@ def build_documents_from_raw(max_products: int | None = None) -> list[Document]:
 
 
 def load_documents() -> list[Document]:
+    """
+    Load documents from the gzip-compressed JSONL file or raw review and metadata data.
+    Args:
+        None
+    Returns:
+        list[Document]: List of Document objects.
+    """
     if SAMPLE_DOCS_PATH.exists():
         rows = load_gz_jsonl(SAMPLE_DOCS_PATH)
         return build_documents_from_rows(rows)

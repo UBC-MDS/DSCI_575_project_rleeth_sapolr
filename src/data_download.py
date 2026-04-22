@@ -4,6 +4,14 @@ import gzip
 import shutil
 
 def download_data(category: str):
+    """
+    Download and extract Amazon review and metadata files for a given category.
+    This function retrieves compressed review and metadata files from the UCSD Amazon dataset, decompresses them on the fly, and saves them locally as JSONL files in the data/raw directory.
+    Args:
+        category (str): Product category name (e.g., "All_Beauty").
+    Returns:
+        None
+    """
     review_url = f"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/review_categories/{category}.jsonl.gz"
     metadata_url = f"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_{category}.jsonl.gz"
     review_output_path = Path(f"../data/raw/{category}.jsonl")

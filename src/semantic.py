@@ -3,6 +3,14 @@ from langchain_huggingface import HuggingFaceEmbeddings
 import os
 
 def sample_documents_by_asin(documents, max_products):
+    """
+    Sample documents based on a maximum number of unique products (ASINs)..
+    Args:
+        documents (list[Document]): List of documents to sample.
+        max_products (int): Maximum number of products to sample.
+    Returns:
+        list[Document]: List of sampled documents.
+    """
     selected_docs = []
     seen_asins = set()
 
@@ -19,7 +27,16 @@ def sample_documents_by_asin(documents, max_products):
     return selected_docs
 
 def create_faiss_index(documents, embedding_model, sample_size=None, reload_index=False):
-    
+    """
+    Create a FAISS index from a list of documents.
+    Args:
+        documents (list[Document]): List of documents to index.
+        embedding_model (HuggingFaceEmbeddings): Embedding model to use.
+        sample_size (int | None): Maximum number of products to sample.
+        reload_index (bool): Whether to reload the index.
+    Returns:
+        FAISS: FAISS index.
+    """
     index_path = "../data/processed/faiss_index"
 
     # Load index if it exists
@@ -46,6 +63,17 @@ def create_faiss_index(documents, embedding_model, sample_size=None, reload_inde
     return vectorstore
 
 def semantic_search(documents, query, k=5, sample_size=None, reload_index=False):
+    """
+    Perform semantic search on a list of documents.
+    Args:
+        documents (list[Document]): List of documents to search.
+        query (str): The query to search for.
+        k (int): Number of results to return.
+        sample_size (int | None): Maximum number of products to sample.
+        reload_index (bool): Whether to reload the index.
+    Returns:
+        list[tuple[Document, float]]: List of (document, score) pairs.
+    """
     vectorstore = create_faiss_index(documents, sample_size, reload_index)
 
     results = vectorstore.similarity_search_with_score(query, k=len(vectorstore.docstore._dict))
@@ -68,4 +96,12 @@ def semantic_search(documents, query, k=5, sample_size=None, reload_index=False)
     
 # To speed up Streamlit
 def load_vectorstore(documents, sample_size=10000):
+    """
+    Load a FAISS index from a list of documents.
+    Args:
+        documents (list[Document]): List of documents to index.
+        sample_size (int): Maximum number of products to sample.
+    Returns:
+        FAISS: FAISS index.
+    """
     return create_faiss_index(documents, sample_size=sample_size, reload_index=False)
