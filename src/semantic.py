@@ -4,7 +4,8 @@ import os
 
 def sample_documents_by_asin(documents, max_products):
     """
-    Sample documents based on a maximum number of unique products (ASINs)..
+    Sample documents by limiting to the first `max_products` unique ASINs.
+    Includes all documents for selected ASINs while preventing new products after the limit.
     Args:
         documents (list[Document]): List of documents to sample.
         max_products (int): Maximum number of products to sample.
@@ -28,7 +29,8 @@ def sample_documents_by_asin(documents, max_products):
 
 def create_faiss_index(documents, embedding_model, sample_size=None, reload_index=False):
     """
-    Create a FAISS index from a list of documents.
+    Create or load a FAISS index for semantic search.
+    Optionally samples documents by unique ASINs and caches the index for reuse.
     Args:
         documents (list[Document]): List of documents to index.
         embedding_model (HuggingFaceEmbeddings): Embedding model to use.
@@ -64,7 +66,8 @@ def create_faiss_index(documents, embedding_model, sample_size=None, reload_inde
 
 def semantic_search(documents, query, k=5, sample_size=None, reload_index=False):
     """
-    Perform semantic search on a list of documents.
+    Perform semantic search and return top-k products based on similarity scores.
+    Aggregates results at the ASIN level by selecting the best-scoring document per product.
     Args:
         documents (list[Document]): List of documents to search.
         query (str): The query to search for.
@@ -97,7 +100,8 @@ def semantic_search(documents, query, k=5, sample_size=None, reload_index=False)
 # To speed up Streamlit
 def load_vectorstore(documents, sample_size=10000):
     """
-    Load a FAISS index from a list of documents.
+    Load a cached FAISS vector store for faster semantic search.
+    Reuses an existing index if available, otherwise creates one.
     Args:
         documents (list[Document]): List of documents to index.
         sample_size (int): Maximum number of products to sample.
